@@ -38,7 +38,7 @@ CODE
 
 file 'bin/rspec', <<-CODE
   #!/bin/bash
-  RAILS_ENV=${RAILS_ENV:-development} ./bin/run bundle exec rspec $@
+  RAILS_ENV=${RAILS_ENV:-test} ./bin/run bundle exec rspec $@
 CODE
 
 file 'bin/run', <<-CODE
