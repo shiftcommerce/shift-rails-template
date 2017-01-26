@@ -1,4 +1,5 @@
 gem 'jsonapi-resources', '0.9.0.beta3'
+gem 'sidekiq', '4.2.9'
 
 gem_group :development, :test do
   gem 'rspec-rails', '~> 3.5'
@@ -10,8 +11,11 @@ gem_group :test do
   gem 'json_api_client', '~> 1.4'
 end
 
+# remove the database config file
+run 'rm config/database.yml'
+
 # empty the existing bin scripts
-run 'rm bin/*.rb'
+run 'rm -r bin'
 
 file 'bin/boot', <<-CODE
   #!/bin/bash
@@ -78,7 +82,7 @@ file 'bin/docker/start_sidekiq', <<-CODE
 CODE
 
 # make all scripts executable
-run 'chmod +x -r bin/**/*'
+run 'chmod +x bin/docker/* bin/*'
 
 file '.dockerignore', <<-CODE
   .git*
@@ -115,6 +119,7 @@ file 'docker-compose.yml', <<-CODE
         - redis
 
     worker:
+      build: .
       command: ./bin/docker/start_sidekiq
       volumes:
         - .:/app
