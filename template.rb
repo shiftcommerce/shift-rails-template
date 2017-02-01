@@ -148,8 +148,11 @@ volumes:
 CODE
 
 file 'Dockerfile', <<-CODE
-FROM ruby:2.4.0
+FROM ruby:2.4-slim
 LABEL maintainer "ryan@ryantownsend.co.uk"
+
+# Install basic packages
+RUN apt-get update && apt-get install -y build-essential git libpq-dev
 
 # Configure the main working directory
 ENV app /app
@@ -159,15 +162,6 @@ WORKDIR $app
 # Set the where to install gems
 ENV GEM_HOME /rubygems
 ENV BUNDLE_PATH /rubygems
-
-# Install bundler to manage Rubygems
-RUN gem install bundler --no-ri --no-rdoc
-
-# Copy our gem file
-COPY Gemfile* ./
-
-# Install the gems
-RUN bundle install --jobs 4 --retry 5
 
 # Link the whole application up
 ADD . $app
