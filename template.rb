@@ -50,6 +50,16 @@ file 'bin/run', <<-CODE
 docker-compose run --rm -e RAILS_ENV=${RAILS_ENV:-development} web $@
 CODE
 
+file 'bin/docker/entrypoint', <<-CODE
+#!/bin/bash
+bundle check || {
+  echo "Installing gems..."
+  bundle install --jobs 4 --retry 5 --quiet
+  echo "Installed gems."
+}
+exec "$@"
+CODE
+
 file 'bin/docker/rails', <<-CODE
 #!/usr/local/bin/ruby
 APP_PATH = File.expand_path('../../config/application', __dir__)
@@ -91,6 +101,7 @@ services:
     command: ./bin/docker/rails s -b 0.0.0.0
     volumes:
       - .:/app
+      - rubygems_cache:/rubygems
     ports:
       - '3000:3000'
     environment: &default_environment
@@ -111,6 +122,7 @@ services:
     command: bundle exec sidekiq -c 4
     volumes:
       - .:/app
+      - rubygems_cache:/rubygems
     environment:
       <<: *default_environment
     depends_on:
@@ -122,18 +134,17 @@ services:
     image: postgres:9.6
     ports:
       - '5432'
-    volumes_from:
-      - box
+    volumes:
+      - postgres_data:/var/lib/postgresql
 
   redis:
     image: redis:3.2
     ports:
       - '6379'
 
-  box:
-    image: busybox
-    volumes:
-      - /var/lib/postgresql
+volumes:
+  postgres_data:
+  rubygems_cache:
 CODE
 
 file 'Dockerfile', <<-CODE
@@ -160,6 +171,9 @@ RUN bundle install --jobs 4 --retry 5
 
 # Link the whole application up
 ADD . $app
+
+# Ensure our gems are installed when running commands
+ENTRYPOINT bin/docker/entrypoint $0 $@
 CODE
 
 file 'codeship-steps.yml', <<-CODE
