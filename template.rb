@@ -1,6 +1,10 @@
 gem 'jsonapi-resources', '0.9.0.beta3'
 gem 'sidekiq', '4.2.9'
 
+gem_group :development do
+  gem 'reek', '~> 4.5'
+end
+
 gem_group :development, :test do
   gem 'rspec-rails', '~> 3.5'
 end
@@ -54,9 +58,17 @@ file 'bin/docker/entrypoint', <<-CODE
 #!/bin/bash
 bundle check || {
   echo "Installing gems..."
-  bundle install --jobs 4 --retry 5 --quiet
-  echo "Installed gems."
+  {
+    bundle install --jobs 4 --retry 5 --quiet && echo "Installed gems."
+  } || {
+    echo "Gem installation failed."
+    exit 1
+  }
 }
+
+# remove any old PIDs
+rm -f "tmp/pids/*"
+
 exec "$@"
 CODE
 
@@ -152,7 +164,11 @@ FROM ruby:2.4-slim
 LABEL maintainer "ryan@ryantownsend.co.uk"
 
 # Install basic packages
-RUN apt-get update && apt-get install -y build-essential git libpq-dev
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+  build-essential \
+  curl \
+  git \
+  libpq-dev
 
 # Configure the main working directory
 ENV app /app
@@ -211,4 +227,19 @@ file '.reek', <<-CODE
 
 IrresponsibleModule:
   enabled: false
+
+LongParameterList:
+  enabled: true
+  exclude:
+  - initialize
+  - 'self.call'
+  max_statements: 5
+
+"app/workers":
+  UtilityFunction:
+    enabled: false
+
+exclude_paths:
+  - db
+  - spec
 CODE
