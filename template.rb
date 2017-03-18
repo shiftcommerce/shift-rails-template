@@ -3,6 +3,7 @@ gem 'sidekiq', '4.2.9'
 
 gem_group :development do
   gem 'reek', '~> 4.5'
+  gem 'foreman', '~> 0.83', '>= 0.83'
 end
 
 gem_group :development, :test do
@@ -54,24 +55,6 @@ file 'bin/run', <<-CODE
 docker-compose run --rm -e RAILS_ENV=${RAILS_ENV:-development} web $@
 CODE
 
-file 'bin/docker/entrypoint', <<-CODE
-#!/bin/bash
-bundle check || {
-  echo "Installing gems..."
-  {
-    bundle install --jobs 4 --retry 5 --quiet && echo "Installed gems."
-  } || {
-    echo "Gem installation failed."
-    exit 1
-  }
-}
-
-# remove any old PIDs
-rm -f "tmp/pids/*"
-
-exec "$@"
-CODE
-
 file 'bin/docker/rails', <<-CODE
 #!/usr/local/bin/ruby
 APP_PATH = File.expand_path('../../config/application', __dir__)
@@ -92,6 +75,39 @@ file 'bin/docker/rspec_with_setup', <<-CODE
 bundle exec rspec
 CODE
 
+file 'bin/docker/ruby_entrypoint', <<-CODE
+#!/bin/bash
+bundle check || {
+  echo "Installing gems..."
+  {
+    bundle install --jobs 4 --retry 5 --quiet && echo "Installed gems."
+  } || {
+    echo "Gem installation failed."
+    exit 1
+  }
+}
+
+# remove any old PIDs
+rm -f "tmp/pids/*"
+
+exec "$@"
+CODE
+
+file 'bin/docker/yarn_entrypoint', <<-CODE
+#!/bin/bash
+yarn check || {
+  echo "Installing Yarn packages..."
+  {
+    yarn install >/dev/null 2>&1 && echo "Installed Yarn packages."
+  } || {
+    echo "Yarn installation failed."
+    exit 1
+  }
+}
+
+exec "$@"
+CODE
+
 # make all scripts executable
 run 'chmod +x bin/docker/* bin/*'
 
@@ -110,13 +126,14 @@ version: '2'
 services:
   web:
     build: .
-    command: ./bin/docker/rails s -b 0.0.0.0
+    command: bundle exec foreman start -f ./Procfile.dev -p 3000
+    entrypoint: ./bin/docker/ruby_entrypoint
     volumes:
       - .:/app
       - rubygems_cache:/rubygems
     ports:
       - '3000:3000'
-    environment: &default_environment
+    environment:
       GEM_HOME: '/rubygems'
       BUNDLE_PATH: '/rubygems'
       DATABASE_URL: 'postgres://postgres:@postgres:5432'
@@ -129,18 +146,13 @@ services:
       - postgres
       - redis
 
-  worker:
+  yarn:
     build: .
-    command: bundle exec sidekiq -c 4
+    command: yarn run webpack --watch
+    entrypoint: ./bin/docker/yarn_entrypoint
     volumes:
       - .:/app
-      - rubygems_cache:/rubygems
-    environment:
-      <<: *default_environment
-    depends_on:
-      - postgres
-      - redis
-      - web
+      - yarn_cache:/app/node_modules
 
   postgres:
     image: postgres:9.6
@@ -159,16 +171,92 @@ volumes:
   rubygems_cache:
 CODE
 
+file 'app.json', <<-CODE
+{
+  "name": "...",
+  "description": "...",
+  "keywords": [
+    "rails",
+    "sidekiq"
+  ],
+  "website": "https://...",
+  "repository": "https://github.com/<username>/<repo>",
+  "logo": "https://raw.githubusercontent.com/<username>/<repo>/master/docs/logo.png",
+  "scripts": {
+    "postdeploy": "bundle exec rake db:schema:load"
+  },
+  "env": {
+    "WEB_CONCURRENCY": {
+      "description": "The number of Puma web processes.",
+      "value": "2"
+    },
+    "RAILS_MAX_THREADS": {
+      "description": "The number of web threads.",
+      "value": "5"
+    },
+    "SIDEKIQ_THREADS": {
+      "description": "The number of concurrent Sidekiq threads.",
+      "value": "5"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "hobby"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "hobby"
+    }
+  },
+  "image": "heroku/ruby",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-redis"
+    },
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.6"
+      }
+    }
+  ]
+}
+CODE
+
 file 'Dockerfile', <<-CODE
 FROM ruby:2.4-slim
 LABEL maintainer "ryan@ryantownsend.co.uk"
 
-# Install basic packages
+# Install essentials and cURL
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
   build-essential \
-  curl \
+  curl
+
+# Add the NodeJS source
+RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
+
+# Add the Yarn source
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+# Install basic packages
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
   git \
-  libpq-dev
+  libpq-dev \
+  nodejs \
+  yarn
+
+# Install yarn
+RUN npm install yarn
 
 # Configure the main working directory
 ENV app /app
@@ -182,8 +270,13 @@ ENV BUNDLE_PATH /rubygems
 # Link the whole application up
 ADD . $app
 
-# Ensure our gems are installed when running commands
-ENTRYPOINT bin/docker/entrypoint $0 $@
+# Ensure our Ruby gems / Yarn packages are installed when running commands
+ENTRYPOINT ./bin/docker/ruby_entrypoint ./bin/docker/yarn_entrypoint $0 $@
+CODE
+
+file 'Procfile.dev', <<-CODE
+web: ./bin/docker/rails s -b 0.0.0.0
+worker: bundle exec sidekiq -c 4
 CODE
 
 file 'codeship-steps.yml', <<-CODE
