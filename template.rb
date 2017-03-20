@@ -169,6 +169,7 @@ services:
 volumes:
   postgres_data:
   rubygems_cache:
+  yarn_cache:
 CODE
 
 file 'app.json', <<-CODE
