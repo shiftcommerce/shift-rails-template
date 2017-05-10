@@ -1,0 +1,77 @@
+version: '2'
+
+services:
+  web:
+    image: <%= app_name %>_ruby
+    build:
+      context: .
+      dockerfile: Dockerfile.ruby
+    command: bundle exec foreman start -f ./Procfile.dev -p 3000
+    entrypoint: ./bin/docker/ruby_entrypoint
+    volumes:
+      - .:/app
+      - rubygems_cache:/rubygems
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - '3000:3000'
+    environment:
+      GEM_HOME: '/rubygems'
+      BUNDLE_PATH: '/rubygems'
+      DATABASE_URL: 'postgres://postgres:@postgres:5432/<%= app_name %>_production'
+      DEVELOPMENT_DATABASE_URL: 'postgres://postgres:@postgres:5432/<%= app_name %>_development'
+      TEST_DATABASE_URL: 'postgres://postgres:@postgres:5432/<%= app_name %>_test'
+      REDIS_URL: 'redis://redis:6379'
+      JWT_BOUNCER_SHARED_SECRET: 'localdevelopment'
+      SELENIUM_URL: 'http://selenium:4444/wd/hub'
+      <% if use_memcache %>MEMCACHE_SERVERS: 'memcached:11211'
+      <% end %>
+    depends_on:
+      - postgres
+      - redis
+      - selenium
+      <% if use_memcache %>- memcached<% end -%>
+
+  yarn:
+    image: <%= app_name %>_yarn
+    build:
+      context: .
+      dockerfile: Dockerfile.yarn
+    command: yarn run devserver
+    ports:
+      - '4000:4000'
+    entrypoint: ./bin/docker/yarn_entrypoint
+    environment:
+      PORT: 4000
+      API_HOST: 'http://localhost:3000'
+    volumes:
+      - .:/app
+      - yarn_cache:/app/node_modules
+  postgres:
+    image: postgres:9.6.2
+    ports:
+      - '9876:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  redis:
+    image: redis:3.2
+    ports:
+      - '6379'
+
+  selenium:
+    image: selenium/standalone-chrome
+    ports:
+      - '4444'
+  <% if use_memcache %>
+  memcached:
+    image: memcached
+    ports:
+      - "11211:11211"
+  <% end -%>
+
+volumes:
+  postgres_data:
+  rubygems_cache:
+  yarn_cache:

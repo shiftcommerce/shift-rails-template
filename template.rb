@@ -1,381 +1,117 @@
-gem 'jsonapi-resources', '0.9.0.beta3'
-gem 'sidekiq', '4.2.9'
+def use_memcache
+  return @use_memcache unless @use_memcache.nil?
+  @use_memcache = yes?("Will you need memcache? (It is required to be setup in Dockerfile and app.json)")
+end
 
+def source_paths
+  [File.expand_path('./templates', File.dirname(__FILE__))]
+end
+# API framework
+gem 'jsonapi-resources', '0.9.0'
+# Add CORS headers
+gem 'rack-cors', '~> 0.4', '>= 0.4.1'
+# Background processing
+gem 'sidekiq', '~> 5.0'
+if use_memcache
+  # Caching
+  gem "dalli", "~> 2.7", ">= 2.7.6"
+end
 gem_group :development do
   gem 'reek', '~> 4.5'
+  gem 'rubocop', '0.46'
   gem 'foreman', '~> 0.83', '>= 0.83'
+  gem 'guard-rspec', '~> 4.7.3', require: false
 end
 
 gem_group :development, :test do
-  gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-rails', '~> 3.6'
+  gem 'pry', '~> 0.10'
 end
 
 gem_group :test do
   gem 'factory_girl_rails', '~> 4.7'
-  gem 'faker', '~> 1.6'
+  gem 'faker', '~> 1.7'
   gem 'json_api_client', '~> 1.4'
+  gem 'rspec_tap', '~>0.1', require: false
+  gem 'rspec_api_blueprint_matchers', '~> 0.1'
 end
 
 # remove the database config file
 run 'rm config/database.yml'
 
+# remove the puma file
+run 'rm config/puma.rb'
+
+# remove the cors file
+run 'rm config/initializers/cors.rb'
+
 # empty the existing bin scripts
 run 'rm -r bin'
 
-file 'bin/boot', <<-CODE
-#!/bin/bash
-# ensure docker-machine won't be used
-unset ${!DOCKER_*}
-# spin up our image
-docker-compose up --build
-CODE
+template 'bin/dev/boot'
+template 'bin/dev/bundle'
+template 'bin/dev/dbconsole'
+template 'bin/dev/guard'
+template 'bin/dev/jest'
+template 'bin/dev/rails'
+template 'bin/dev/rake'
+template 'bin/dev/rspec'
+template 'bin/dev/run'
+template 'bin/dev/yarn'
+template 'bin/docker/ruby_entrypoint'
+template 'bin/docker/yarn_entrypoint'
+template 'bin/docker/dbconsole'
 
-file 'bin/bundle', <<-CODE
-#!/bin/bash
-RAILS_ENV=${RAILS_ENV:-development} ./bin/run bundle $@
-CODE
-
-file 'bin/rails', <<-CODE
-#!/bin/bash
-RAILS_ENV=${RAILS_ENV:-development} ./bin/run ./bin/docker/rails $@
-CODE
-
-file 'bin/rake', <<-CODE
-#!/bin/bash
-RAILS_ENV=${RAILS_ENV:-development} ./bin/run ./bin/docker/rake $@
-CODE
-
-file 'bin/rspec', <<-CODE
-#!/bin/bash
-RAILS_ENV=${RAILS_ENV:-test} ./bin/run bundle exec rspec $@
-CODE
-
-file 'bin/run', <<-CODE
-#!/bin/bash
-docker-compose run --rm -e RAILS_ENV=${RAILS_ENV:-development} web $@
-CODE
-
-file 'bin/docker/rails', <<-CODE
-#!/usr/local/bin/ruby
-APP_PATH = File.expand_path('../../config/application', __dir__)
-require_relative '../../config/boot'
-require 'rails/commands'
-CODE
-
-file 'bin/docker/rake', <<-CODE
-#!/usr/local/bin/ruby
-require_relative '../../config/boot'
-require 'rake'
-Rake.application.run
-CODE
-
-file 'bin/docker/rspec_with_setup', <<-CODE
-#!/bin/bash
-./bin/docker/rake db:migrate
-bundle exec rspec
-CODE
-
-file 'bin/docker/ruby_entrypoint', <<-CODE
-#!/bin/bash
-bundle check || {
-  echo "Installing gems..."
-  {
-    bundle install --jobs 4 --retry 5 --quiet && echo "Installed gems."
-  } || {
-    echo "Gem installation failed."
-    exit 1
-  }
-}
-
-# remove any old PIDs
-rm -f "tmp/pids/*"
-
-exec "$@"
-CODE
-
-file 'bin/docker/yarn_entrypoint', <<-CODE
-#!/bin/bash
-yarn check || {
-  echo "Installing Yarn packages..."
-  {
-    yarn install >/dev/null 2>&1 && echo "Installed Yarn packages."
-  } || {
-    echo "Yarn installation failed."
-    exit 1
-  }
-}
-
-exec "$@"
-CODE
+template 'bin/rails'
+template 'bin/rake'
 
 # make all scripts executable
-run 'chmod +x bin/docker/* bin/*'
+run 'chmod +x bin/docker/* bin/* bin/dev/*'
 
-file '.dockerignore', <<-CODE
-.git*
-log/*
-tmp/*
-Dockerfile
-docker-compose.yml
-README.md
-CODE
+# Docker
+template '.dockerignore'
+template 'docker-compose.yml'
+template 'Dockerfile.ruby'
+template 'Dockerfile.yarn'
 
-file 'docker-compose.yml', <<-CODE
-version: '2'
+# Heroku app.json
+template 'app.json'
+template 'Procfile'
+template 'Procfile.dev'
 
-services:
-  web:
-    build: .
-    command: bundle exec foreman start -f ./Procfile.dev -p 3000
-    entrypoint: ./bin/docker/ruby_entrypoint
-    volumes:
-      - .:/app
-      - rubygems_cache:/rubygems
-    ports:
-      - '3000:3000'
-    environment:
-      GEM_HOME: '/rubygems'
-      BUNDLE_PATH: '/rubygems'
-      DATABASE_URL: 'postgres://postgres:@postgres:5432'
-      REDIS_URL: 'redis://redis:6379'
-    depends_on:
-      - postgres
-      - redis
-    # needed for Codeship Pro:
-    links:
-      - postgres
-      - redis
+# Rails config
+template 'config/puma.rb'
+template 'config/initializers/cors.rb'
+template 'config/initializers/jsonapi_resources.rb'
 
-  yarn:
-    build: .
-    command: yarn run webpack --watch
-    entrypoint: ./bin/docker/yarn_entrypoint
-    volumes:
-      - .:/app
-      - yarn_cache:/app/node_modules
+# Front end
+template 'public/index.html'
+template 'app/assets/javascripts/pages/WelcomePage.js'
+template 'app/assets/javascripts/actions.js'
+template 'app/assets/javascripts/configureStore.js'
+template 'app/assets/javascripts/index.js'
+template 'app/assets/javascripts/rootReducer.js'
+template 'app/assets/stylesheets/application.css.scss'
 
-  postgres:
-    image: postgres:9.6
-    ports:
-      - '5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql
+# Node config
+template 'package.json'
+template 'webpack.config.js'
+template '.babelrc'
 
-  redis:
-    image: redis:3.2
-    ports:
-      - '6379'
+# Code quality tools
+template '.codeclimate.yml'
+template '.reek'
+template '.rubocop.yml'
+template 'config/rubocop/.lint_rubocop.yml'
+template 'config/rubocop/.metrics_rubocop.yml'
+template 'config/rubocop/.performance_rubocop.yml'
+template 'config/rubocop/.rails_rubocop.yml'
+template 'config/rubocop/.style_rubocop.yml'
 
-volumes:
-  postgres_data:
-  rubygems_cache:
-  yarn_cache:
-CODE
+# RSpec Setup
+template 'spec/support/rspec_api_blueprint_matchers.rb'
+template 'spec/support/api_documentation_coverage.rb'
+template 'spec/support/api_http_recorder.rb'
 
-file 'app.json', <<-CODE
-{
-  "name": "...",
-  "description": "...",
-  "keywords": [
-    "rails",
-    "sidekiq"
-  ],
-  "website": "https://...",
-  "repository": "https://github.com/<username>/<repo>",
-  "logo": "https://raw.githubusercontent.com/<username>/<repo>/master/docs/logo.png",
-  "scripts": {
-    "postdeploy": "bundle exec rake db:schema:load"
-  },
-  "env": {
-    "WEB_CONCURRENCY": {
-      "description": "The number of Puma web processes.",
-      "value": "2"
-    },
-    "RAILS_MAX_THREADS": {
-      "description": "The number of web threads.",
-      "value": "5"
-    },
-    "SIDEKIQ_THREADS": {
-      "description": "The number of concurrent Sidekiq threads.",
-      "value": "5"
-    }
-  },
-  "formation": {
-    "web": {
-      "quantity": 1,
-      "size": "hobby"
-    },
-    "worker": {
-      "quantity": 1,
-      "size": "hobby"
-    }
-  },
-  "image": "heroku/ruby",
-  "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    },
-    {
-      "url": "heroku/ruby"
-    }
-  ],
-  "addons": [
-    {
-      "plan": "heroku-redis"
-    },
-    {
-      "plan": "heroku-postgresql",
-      "options": {
-        "version": "9.6"
-      }
-    }
-  ]
-}
-CODE
-
-file 'config/puma.rb', <<-CODE
-# Puma can serve each request in a thread from an internal thread pool.
-# The `threads` method setting takes two numbers a minimum and maximum.
-# Default is 5
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i
-threads threads_count, threads_count
-
-# Specifies the `port` that Puma will listen on to receive requests, default is 3000.
-port ENV.fetch("PORT") { 3000 }
-
-# Specifies the `environment` that Puma will run in.
-environment ENV.fetch("RAILS_ENV") { "development" }
-
-# Specifies the number of `workers` to boot in clustered mode.
-workers ENV.fetch("WEB_CONCURRENCY") { 2 }
-
-preload_app!
-
-on_worker_boot do
-  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
-end
-
-plugin :tmp_restart
-CODE
-
-file 'Dockerfile', <<-CODE
-FROM ruby:2.4-slim
-LABEL maintainer "ryan@ryantownsend.co.uk"
-
-# Install essentials and cURL
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
-  build-essential \
-  curl
-
-# Add the NodeJS source
-RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
-
-# Add the Yarn source
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-
-# Install basic packages
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
-  git \
-  libpq-dev \
-  nodejs \
-  yarn
-
-# Install yarn
-RUN npm install yarn
-
-# Configure the main working directory
-ENV app /app
-RUN mkdir $app
-WORKDIR $app
-
-# Set the where to install gems
-ENV GEM_HOME /rubygems
-ENV BUNDLE_PATH /rubygems
-
-# Link the whole application up
-ADD . $app
-
-# Ensure our Ruby gems / Yarn packages are installed when running commands
-ENTRYPOINT ./bin/docker/ruby_entrypoint ./bin/docker/yarn_entrypoint $0 $@
-CODE
-
-file 'Procfile.dev', <<-CODE
-web: ./bin/docker/rails s -b 0.0.0.0
-worker: bundle exec sidekiq -c 4
-CODE
-
-file 'codeship-steps.yml', <<-CODE
-- name: rspec
-  service: web
-  command: ./bin/docker/rspec_with_setup
-CODE
-
-file '.codeclimate.yml', <<-CODE
-engines:
-  brakeman:
-    enabled: true
-  bundler-audit:
-    enabled: true
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - ruby
-  fixme:
-    enabled: true
-  rubocop:
-    enabled: true
-  reek:
-    enabled: true
-ratings:
-  paths:
-  - Gemfile.lock
-  - "**.erb"
-  - "**.rb"
-exclude_paths:
-- config/
-- db/
-- spec/
-- test/
-- bin/
-CODE
-
-file '.reek', <<-CODE
----
-
-IrresponsibleModule:
-  enabled: false
-
-LongParameterList:
-  enabled: true
-  exclude:
-  - initialize
-  - 'self.call'
-  max_statements: 5
-
-"app/workers":
-  UtilityFunction:
-    enabled: false
-
-exclude_paths:
-  - db
-  - spec
-CODE
-
-file 'config/initializers/jsonapi_resources.rb', <<-CODE
-require 'jsonapi-resources'
-
-JSONAPI.configure do |config|
-  config.json_key_format = :underscored_key
-
-  # set some sensible limits
-  config.default_page_size = 10
-  config.maximum_page_size = 100
-
-  # add pagination by default
-  config.default_paginator = :offset
-  config.top_level_meta_include_record_count = true
-  config.top_level_meta_record_count_key = :record_count
-end
-CODE
+# Starting point for API documentation
+template 'docs/api/root.apib'
