@@ -1,0 +1,94 @@
+# Metrics::AbcSize
+# (Assignment Branch Condition)
+#
+# Checks that the ABC size of methods is not higher thatn the configured maximum
+
+Metrics/AbcSize:
+  Max: 15
+
+# Metrics::BlockLength
+#
+# Checks if the length of a block exceeds some maximum value.
+# Comment lines are ignored
+
+Metrics/BlockLength:
+  CountComments: false
+  Max: 25
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*.rb'
+
+# Metrics::BlockNesting
+#
+# Checks for excessive nesting of conditional and looping constructs
+
+Metrics/BlockNesting:
+  Max: 3
+
+# Metrics::ClassLength
+#
+# Checks if the length of a class exceeds some maximum value.
+# This can be used to ensure 'one responsibility per class" rule.
+
+Metrics/ClassLength:
+  CountComments: false
+  Max: 100
+
+# Metrics::CyclomaticComplexity
+#
+# Checks that the cyclomatic complexity of methods is not higher than the configured maximum.
+# (Cyclomatic complexity is the number of linearly independent paths through a method)
+
+Metrics/CyclomaticComplexity:
+  Max: 6
+
+# Metrics::LineLength
+#
+# Checks the length of lines in the source code.
+
+Metrics/LineLength:
+  Max: 160
+  AllowHereDoc: true
+  AllowURI: true
+  URISchemes:
+    -http
+    -https
+  Exclude:
+  - "spec/**/*"
+  - "views/**/*"
+  - "public/**/*"
+
+# Metrics::MethodLength
+#
+# Checks if the length of the method exceeds some maximum value.
+
+Metrics/MethodLength:
+  CountComments: false
+  Max: 10
+
+# Metrics::ModuleLength
+#
+# Checks if the length of a module exceeds some maximum value.
+
+Metrics/ModuleLength:
+  CountComments: false
+  Max: 100
+
+# Metrics::ParameterLists
+#
+# Checks for methods with too many parameters.
+
+Metrics/ParameterLists:
+  Max: 5
+  CountKeywordArgs: true
+
+
+# Metrics::PerceivedComplexity
+#
+# Tries to product a complexity score that's a measure of the complexity
+# the reader experiences when looking at a method.
+
+Metrics/PerceivedComplexity:
+  Max: 7
+

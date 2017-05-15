@@ -1,0 +1,749 @@
+# Lint::AmbiguousOperator
+#
+# Checks for ambiguous operators in the first argument of a method invocation without parentheses.
+#
+# bad: do_something *some_array
+#
+# The '*' is interpreted as a splat operator but it could possibly be
+# a '*' method invocation (i.e. 'do_something.*(some_array)')
+#
+# good: do_something(*some_array)
+#
+Lint/AmbiguousOperator:
+  Enabled: true
+
+# Lint::AmbiguousRegexpLiteral
+#
+# Checks for ambiguous regexp literals in the first argument of a method invocation without parentheses.
+#
+# bad: do_something /pattern/i
+#
+# This is interpreted as a method invocation with a regexp literal,
+# but it could possibly be `/` method invocations. (i.e. `do_something./(pattern)./(i)`)
+#
+# good: do_something(/pattern/i)
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: true
+
+# Lint::AssignmentInCondition
+#
+# Checks for assignments in the conditions of if/while/until
+# (This also helps in accidentally using an assignment operator instead of a comparison)
+#
+# bad:
+#
+#   if some_var = true
+#    do_something
+#   end
+#
+# good:
+#
+#   if some_var == true
+#    do_something
+#   end
+#
+Lint/AssignmentInCondition:
+  AllowSafeAssignment: true
+
+# Lint::BlockAlignment
+#
+# Checks whether the end keywords are aligned properly for do end blocks.
+#
+# The value `start_of_block` means that the `end` should be aligned with line
+# where the `do` keyword appears.
+#
+# The value `start_of_line` means it should be aligned with the whole
+# expression's starting line.
+#
+# The value `either` means both are allowed.
+
+Lint/BlockAlignment:
+  AlignWith: either
+
+# Lint::CircularArgumentReference
+#
+# Checks for circular argument reference in optional keyword arguments and optional
+# ordinal arguments
+#
+# bad:
+#
+#   def bake(pie: pie)
+#     pie.heat_up
+#   end
+#
+# good:
+#
+#   def bake(pie:)
+#     pie.heat_up
+#   end
+
+Lint/CircularArgumentReference:
+  Enabled: true
+
+# Lint::ConditionPosition
+#
+# Checks for conditions that are not on the same line as if/while/until.
+#
+# bad:
+#
+#   if
+#     some_condition
+#     do_something
+#   end
+#
+# good:
+#
+#   if some_condition
+#     do_something
+#   end
+#
+Lint/ConditionPosition:
+  Enabled: false
+
+# Lint::Debugger
+#
+# Checks for calls to debugger or pry.
+
+Lint/Debugger:
+  Enabled: true
+
+# Lint::DefEndAlignment
+#
+# Checks whether the end keywords of method definitions are aligned properly
+
+Lint/DefEndAlignment:
+  AlignWith: start_of_line
+  AutoCorrect: true
+
+# Lint::DeprecatedClassMethods
+#
+# Checks for used of the deprecated class method usages.
+#
+# bad:
+#
+#   file.exists?(some_path)
+#
+# good:
+#
+#   file.exist?(some_path)
+#
+Lint/DeprecatedClassMethods:
+  Enabled: true
+
+# Lint::DuplicateCaseCondition
+#
+# Checks that there are no repeated conditions used in case 'when' expressions
+#
+# bad:
+#  case x
+#  when 'first'
+#    do_something
+#  when 'first'
+#    do_something_else
+#  end
+
+Lint/DuplicateCaseCondition:
+  Enabled: true
+
+# Lint::DuplicateMethods
+#
+# Checks for duplicated instance (or singleton) method definitions.
+#
+# bad:
+#
+#  def duplicated
+#    1
+#  end
+#
+#  def duplicated
+#    2
+#  end
+
+Lint/DuplicateMethods:
+  Enabled: true
+
+# Lint::DuplicateKey
+#
+# Checks for duplicated keys in hash literals
+#
+# bad:  hash = { food: 'apple', food: 'orange' }
+
+Lint/DuplicateKey:
+  Enabled: true
+
+# Lint::EachWithObjectArgument
+#
+# Checks if each_with_object is called with an immutable argument.
+#
+# Example:
+#     sum = numbers.each_with_object(0) { |e, a| a += e }
+
+Lint/EachWithObjectArgument:
+  Enabled: true
+
+# Lint::ElseLayout
+#
+# Checks for odd else block layout (usually a mistake in coding).
+#
+# bad:
+#
+#   if something
+#    ... do something...
+#   else do_this
+#    do_that
+#   end
+#
+# good:
+#
+#   if something
+#     ... do something...
+#   else
+#    do_this
+#    do_that
+#   end
+#
+Lint/ElseLayout:
+  Enabled: true
+
+# Lint::EmptyEnsure
+#
+# Checks for empty ensure blocks.
+#
+# bad:
+#
+#   def some_method
+#     do_something
+#   ensure
+#   end
+#
+# good:
+#
+#   def some_method
+#     do_something
+#   ensure
+#     do_something_else
+#   end
+#
+Lint/EmptyEnsure:
+  Enabled: true
+
+# Lint::EmptyExpression
+#
+# Checks for the presence of empty expressions
+#
+# bad:
+#
+#  foo = ()
+#  if ()
+#    bar
+#  end
+
+Lint/EmptyExpression:
+  Enabled: true
+
+# Lint::EmptyInterpolation
+#
+# Checks for empty interpolation
+
+Lint/EmptyInterpolation:
+  Enabled: true
+
+# Lint::EmptyWhen
+#
+# Checks for the presence of 'when' branches without a body
+#
+# bad:
+#
+#  case foo
+#  when bar then 1
+#  when baz then #nothing
+#  end
+#
+Lint/EmptyWhen:
+  Enabled: true
+
+# Lint::EndAlignment
+#
+# Checks whether the end keywords are aligned properly
+
+Lint/EndAlignment:
+  AlignWith: keyword
+  AutoCorrect: true
+
+# Lint::EndInMethod
+#
+# Checks for END blocks in method definitions
+# ( Use `at_exit` instead )
+
+Lint/EndInMethod:
+  Enabled: true
+
+# Lint::EnsureReturn
+#
+# Checks for `return` from an `ensure` block.
+# ( Do not return from an `ensure` block. )
+
+Lint/EnsureReturn:
+  Enabled: true
+
+# Lint::Eval
+#
+# Checks for the use of *Kernel#eval*.
+# ( Using eval is serious security risk )
+
+Lint/Eval:
+  Enabled: false
+
+# Lint::FloatOutOfRange
+#
+# Identifies Float literal which are, like, too big.
+
+Lint/FloatOutOfRange:
+  Enabled: true
+
+# Lint::FormatParameterMismatch
+#
+# Sees if there is a mismatch between the number of expected fields for format/sprintf/#% and
+# what is actually passed as arguments
+#
+# Example:
+#   format('A value: %s and another: %i', a_value)
+
+Lint/FormatParameterMismatch:
+  Enabled: true
+
+# Style::HandleExceptions
+#
+# Checks for rescue blocks with no body.
+#
+# bad:
+#
+#   def some_method
+#     do_something
+#   rescue
+#     #do_nothing
+#   end
+#
+# good:
+#
+#   def some_method
+#     do_something
+#   rescue
+#     handle_exception
+#   end
+#
+Lint/HandleExceptions:
+  Enabled: true
+
+# Lint::ImplicitStringConcatenation
+#
+# Checks for implicit string concatenation of string literals which are on the same line
+#
+# bad:
+#
+# array = ['Item 1' 'Item 2']
+#
+# good:
+#
+# array = ['Item 1Item 2']
+
+Lint/ImplicitStringConcatenation:
+  Enabled: true
+
+# Lint::IneffectiveAccessModifier
+#
+# Checks for 'private' or 'protected' access modifiers which are applied to a singleton method.
+# These access modifiers do not make singleton methods private/protected.
+#'private_class_method' can be used for that.
+#
+# bad:
+#
+#  class C
+#    private
+#
+#    def self.method
+#      puts 'hi'
+#    end
+#  end
+#
+# good:
+#
+#  class C
+#    def self.method
+#      puts 'hi'
+#    end
+#
+#    private_class_method :method
+#  end
+#
+
+Lint/IneffectiveAccessModifier:
+  Enabled: false
+
+# Lint::InheritException
+#
+# Looks for error classes inheriting from 'Exception' and its standard library subclasses,
+# excluding subclasses of 'StandardError'.
+
+Lint/InheritException:
+  EnforcedStyle: runtime_error
+
+# Lint::InvalidCharacterLiteral
+#
+# Checks for invalid character literals with a non-escaped whitespace character (e.g. `?`).
+# Generally this results in syntax errors.
+#
+# bad:  p(? )
+Lint/InvalidCharacterLiteral:
+  Enabled: false
+
+# Lint::LiteralInCondition
+#
+# Checks for literals used as the conditions or as operands in and/or
+# expressions serving as the conditions of if/while/until.
+#
+# bad:
+#
+#  if some_var && true
+#    do_something
+#  end
+#
+# good:
+#
+#  if some_var && some_condition
+#    do_something
+#  end
+#
+Lint/LiteralInCondition:
+  Enabled: true
+
+# Lint::LiteralInInterpolation
+#
+# Checks for interpolated literals.
+#
+# bad: "result is #{10}"
+#
+# good: "result is 10"
+
+Lint/LiteralInInterpolation:
+  Enabled: true
+
+# Lint::Loop
+#
+# Checks for uses of *begin...end while/until something*.
+#
+# using while:
+#
+# bad:
+#
+#   begin
+#     do_something
+#   end while some_condition
+#
+# good:
+#
+#   while some_condition
+#     do_something
+#   end
+#
+
+Lint/Loop:
+  Enabled: true
+
+# Lint::NestedMethodDefinition
+#
+# Checks for nested method definitions.
+
+Lint/NestedMethodDefinition:
+  Enabled: true
+
+# Lint::NextWithoutAccumulator
+#
+# Don't omit the accumulator when calling `next` in a `reduce` block
+#
+# bad:
+#
+#   result = (1..4).reduce(0) do |acc,i|
+#     next if i.odd?
+#     acc + i
+#   end
+#
+# good:
+#
+#   result = (1..4).reduce(0) do |acc,i|
+#     next if i.odd?
+#     acc + i
+#   end
+#
+
+Lint/NextWithoutAccumulator:
+  Enabled: true
+
+# Lint::NonLocalExitFromIterator
+#
+# Checks for non-local exit from iterator.
+
+Lint/NonLocalExitFromIterator:
+  Enabled: true
+
+# Lint::ParenthesesAsGroupedExpression
+#
+# Checks for space between the name of a called method and left parenthesis.
+#
+# bad: puts (x + y)
+#
+# good: puts(x + y)
+#
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: true
+
+# Lint::PercentStringArray
+#
+# Checks for quotes and commas in %w, e.g.
+#
+# Example: `%w('foo', "bar")`
+
+Lint/PercentStringArray:
+  Enabled: true
+
+# Lint::PercentSymbolArray
+#
+# Checks for colons and commas in %i, e.g.
+#
+# Example: `%i(:foo, :bar)`
+
+Lint/PercentSymbolArray:
+  Enabled: true
+
+# Lint::RandOne
+#
+# Checks for `rand(1)` calls. Such calls always return `0`
+
+Lint/RandOne:
+  Enabled: true
+
+# Lint::RequireParentheses
+#
+# Checks for expressions where there is a call to a predicate method with at least one argument,
+# where no paranthesis are used around the parameter list, and a boolean operator, && or ||,
+# is used in the last argument.
+# The idea behing this warning for these constructs is that the user might be under the impression
+# that the return value from the method call is an operand of &&/||.
+#
+# bad:
+#
+#   if day.is? :tuesday && month == :jan
+#
+# good:
+#
+#   if day.is?(:tuesday) && month == :jan
+#
+Lint/RequireParentheses:
+  Enabled: true
+
+# Lint::RescueException
+#
+# Checks for `rescue` blocks targeting the Exception class.
+# ( Avoid rescuing the Exception class. )
+
+Lint/RescueException:
+  Enabled: true
+
+# Lint::ShadowedException
+#
+# Checks for a rescued exception that get shadowed by a less specific exception being
+# rescued before a more specific exception is rescued
+#
+# bad:
+#
+#  begin
+#    something
+#  rescue Exception
+#    handle_exception
+#  rescue StandardError
+#    handle_standard_error
+#  end
+#
+# good:
+#
+#  begin
+#    something
+#  rescue StandardError
+#    handle_standard_error
+#  rescue Exception
+#    handle_exception
+#  end
+
+Lint/ShadowedException:
+  Enabled: true
+
+# Lint::ShadowingOuterLocalVariable
+#
+# Looks for use of the same name as outer local variables for block arguments or block
+# local variables.
+
+Lint/ShadowingOuterLocalVariable:
+  Enabled: true
+
+# Lint::StringConversionInInterpolation
+#
+# Checks for string conversion in string interpolation, which is redundant.
+#
+# Example:  "result is #{something.to_s}"
+
+Lint/StringConversionInInterpolation:
+  Enabled: true
+
+# Lint::UnderscorePrefixedVariableName
+#
+# Checks for underscore-prefixed variables that are actually used.
+#
+# bad:
+#
+#  [1,2,3].each do |_num|
+#     do_something(_num)
+#   end
+#
+# good:
+#
+#  [1,2,3].each do |_num|
+#     do_something  # not using `_num`
+#  end
+#
+Lint/UnderscorePrefixedVariableName:
+  Enabled: true
+
+# Lint::UnifiedInteger
+#
+# Checks for using Fixnum or BigNum constant
+#
+# bad:
+#
+#  1.is_a?(Fixnum)
+#  1.is_a?(Bignum)
+#
+# good:
+#
+#  1.is_a?(Integer)
+
+Lint/UnifiedInteger:
+  Enabled: true
+
+# Lint::UnneededDisable
+#
+# Detects the instances of rubocop:disableComments that can be removed without causing any
+# offenses to be reported.
+
+Lint/UnneededDisable:
+  Enabled: true
+
+# Lint::UnneededSplatExpansion
+#
+# Checks for unneeded usages of splat expansion
+#
+# bad:  a = *[1, 2, 3]
+#
+# good: a = [1, 2, 3]
+
+Lint/UnneededSplatExpansion:
+  Enabled: true
+
+# Lint::UnreachableCode
+#
+# Checks for unreachable code.
+
+Lint/UnreachableCode:
+  Enabled: true
+
+# Lint::UnusedBlockArgument
+#
+# Checks for unused block arguments
+#
+# bad:
+#
+#  do_something do |used, _unused|
+#    puts used
+#  end
+#
+# good:
+#
+#  do_something do |used|
+#    puts used
+#  end
+
+Lint/UnusedBlockArgument:
+  Enabled: true
+
+# Lint::UnusedMethodArgument
+#
+# Checks for unused method argument
+
+Lint/UnusedMethodArgument:
+  Enabled: true
+
+# Lint::UselessAccessModifier
+#
+# Checks for redundant access modifiers, including those with no code,
+# those which are repeated, and leading `public` modifiers in a class or module body.
+
+Lint/UselessAccessModifier:
+  Enabled: true
+
+# Lint::UselessAssignment
+#
+# Checks for every useless assignment to local variable in every scope.
+
+Lint/UselessAssignment:
+  Enabled: true
+
+# Lint::UselessComparison
+#
+# Checks for comparison of something with itself.
+
+Lint/UselessComparison:
+  Enabled: true
+
+# Lint::UselessElseWithoutRescue
+#
+# Checks for useless `else` in `begin..end` without `rescue`
+#
+# Example:
+#
+#  begin
+#    do_something
+#  else
+#    handle_errors #this will never be run.
+#  end
+
+Lint/UselessElseWithoutRescue:
+  Enabled: true
+
+# Lint::UselessSetterCall
+#
+# Checks for a setter call to local variable as the final expression of a function definition
+
+Lint/UselessSetterCall:
+  Enabled: true
+
+
+# Lint::Void
+#
+# Checks for operators, variables and literals used in void context.
+#
+# bad:
+#
+#   def some_method
+#     some_num * 10
+#     do_something
+#   end
+#
+# good:
+#
+#  def some_method
+#     do_something
+#     some_num * 10
+#  end
+#
+Lint/Void:
+  Enabled: false

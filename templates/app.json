@@ -1,0 +1,104 @@
+{
+  "name": "<%= app_name %>",
+  "description": "#{app_name} service",
+  "keywords": [
+    "rails",
+    "sidekiq"
+  ],
+  "website": "https://github.com/shiftcommerce/#{app_name.gsub(/_/,'-')}",
+  "repository": "https://github.com/shiftcommerce/#{app_name.gsub(/_/,'-')}",
+  "logo": "https://raw.githubusercontent.com/shiftcommerce/#{app_name.gsub(/_/,'-')}/master/docs/logo.png",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "DISABLE_DATABASE_ENVIRONMENT_CHECK=1; bundle exec rake db:structure:load db:seed"
+  },
+  "env": {
+    "WEB_CONCURRENCY": {
+      "description": "The number of Puma web processes.",
+      "value": "2"
+    },
+    "RAILS_MAX_THREADS": {
+      "description": "The number of web threads.",
+      "value": "5"
+    },
+    "SIDEKIQ_THREADS": {
+      "description": "The number of concurrent Sidekiq threads.",
+      "value": "5"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "The secret key required for Rails.",
+      "generator": "secret"
+    }
+  },
+  "formation": [
+    {
+      "process": "web",
+      "quantity": 1,
+      "size": "hobby"
+    },
+    {
+      "process": "worker",
+      "quantity": 1,
+      "size": "hobby"
+    }
+  ],
+  "image": "heroku/ruby",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-redis"
+    },
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.6"
+      }
+    }<% if use_memcache %>,
+    {
+      "plan": "memcachedcloud:30"
+    }<% end %>
+  ],
+  "environments": {
+    "test": {
+      "scripts": {
+        "test": "bundle exec rspec -f RspecTap::Formatter && jest && cd vendor/gems/shift-base && rspec -f RspecTap::Formatter"
+      },
+      "stack": "cedar-14",
+      "buildpacks": [
+        {
+          "url": "heroku/nodejs"
+        },
+        {
+          "url": "heroku/ruby"
+        },
+        {
+          "url": "https://github.com/heroku/heroku-buildpack-xvfb-google-chrome"
+        },
+        {
+          "url": "https://github.com/heroku/heroku-buildpack-chromedriver"
+        },
+        {
+          "url": "https://github.com/shiftcommerce/drafter-buildpack.git"
+        }
+      ],
+      "addons": [
+        {
+          "plan": "heroku-redis:hobby-dev"
+        },
+        {
+          "plan": "heroku-postgresql:hobby-dev",
+          "options": {
+            "version": "9.6"
+          }
+        }
+      ]
+    }
+  }
+}

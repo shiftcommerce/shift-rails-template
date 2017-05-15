@@ -1,0 +1,43 @@
+# To find more info about this,
+# please read the following line
+# https://docs.codeclimate.com/docs/getting-started-configuration
+
+engines:
+  brakeman:
+    enabled: true
+  bundler-audit:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        ruby:
+          count_threshold: 3
+  fixme:
+    enabled: true
+  rubocop:
+    enabled: true
+  reek:
+    enabled: true
+  eslint:
+    enabled: true
+ratings:
+  paths:
+  - Gemfile.lock
+  - "**.erb"
+  - "**.rb"
+  - "**.js"
+exclude_paths:
+- config/
+- db/
+- spec/
+- lib/
+- test/
+- bin/
+- public/
+- vendor/gems/**/bin/
+- vendor/gems/**/spec/
+- vendor/gems/**/test/
+- vendor/gems/**/lib/
+- vendor/gems/**/*.gemspec
+- vendor/gems/**/README.md

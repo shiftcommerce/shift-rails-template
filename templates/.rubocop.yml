@@ -1,0 +1,27 @@
+
+# To find more info about this,
+# please read the following line
+# http://www.rubydoc.info/github/bbatsov/rubocop/Rubocop
+
+inherit_from:
+  - config/rubocop/.lint_rubocop.yml
+  - config/rubocop/.metrics_rubocop.yml
+  - config/rubocop/.performance_rubocop.yml
+  - config/rubocop/.rails_rubocop.yml
+  - config/rubocop/.style_rubocop.yml
+
+AllCops:
+  Exclude:
+    - "db"
+    - "tmp"
+    - "coverage"
+    - "public"
+    - "Gemfile"
+    - "Gemfile.lock"
+    - "Guardfile"
+    - "config/*"
+    - "bin/*"
+    - "config.ru"
+    - "spec"
+    - "vendor/gems/**/spec/**"
+  TargetRubyVersion: 2.4
