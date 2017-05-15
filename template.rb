@@ -34,6 +34,9 @@ gem_group :test do
   gem 'json_api_client', '~> 1.4'
   gem 'rspec_tap', '~>0.1', require: false
   gem 'rspec_api_blueprint_matchers', '~> 0.1'
+  gem 'capybara', '~> 2.14'
+  gem 'capybara-screenshot', '~> 1.0'
+  gem 'selenium-webdriver', '~> 3.4'
 end
 
 # remove the database config file
@@ -83,6 +86,7 @@ template 'Procfile.dev'
 template 'config/puma.rb'
 template 'config/initializers/cors.rb'
 template 'config/initializers/jsonapi_resources.rb'
+template 'config/database.yml'
 
 # Front end
 template 'public/index.html'
@@ -109,9 +113,13 @@ template 'config/rubocop/.rails_rubocop.yml'
 template 'config/rubocop/.style_rubocop.yml'
 
 # RSpec Setup
+template '.rspec'
+template 'spec/rails_helper.rb'
+template 'spec/spec_helper.rb'
 template 'spec/support/rspec_api_blueprint_matchers.rb'
 template 'spec/support/api_documentation_coverage.rb'
 template 'spec/support/api_http_recorder.rb'
+template 'spec/support/capybara.rb'
 
 # Starting point for API documentation
 template 'docs/api/root.apib'

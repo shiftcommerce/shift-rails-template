@@ -2,7 +2,7 @@ FROM ruby:2.4.1-slim
 LABEL maintainer "team@shiftcommerce.com"
 
 # Install essentials and cURL
-RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essential curl git libpq-dev python
+RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essential curl git libpq-dev python unzip
 
 # Install drafter for API Blueprint Parsing
 RUN mkdir /tmp_build

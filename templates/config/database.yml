@@ -1,0 +1,9 @@
+# warning: if you modify this file for your own setup, do not commit the changes
+# only commit changes if they are to be shared with others on the project.
+
+development:
+  url: <%= ENV['DEVELOPMENT_DATABASE_URL'] %>
+test:
+  url: <%= ENV['TEST_DATABASE_URL'] %>
+production:
+  url: <%= ENV['DATABASE_URL'] %>
