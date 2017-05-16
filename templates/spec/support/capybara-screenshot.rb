@@ -8,3 +8,4 @@ if ENV.key?('SCREENSHOT_S3_ACCESS_KEY_ID') && ENV['SCREENSHOT_S3_ACCESS_KEY_ID']
     bucket_name: "test_screenshots"
   }
 end
+Capybara::Screenshot.prune_strategy = :keep_last_run
