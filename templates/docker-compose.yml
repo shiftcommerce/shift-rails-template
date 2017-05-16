@@ -31,6 +31,7 @@ services:
       - postgres
       - redis
       - selenium
+      - yarn
       <% if use_memcache %>- memcached<% end -%>
 
   yarn:
@@ -44,7 +45,7 @@ services:
     entrypoint: ./bin/docker/yarn_entrypoint
     environment:
       PORT: 4000
-      API_HOST: 'http://localhost:3000'
+      API_HOST: 'http://web:3000'
     volumes:
       - .:/app
       - yarn_cache:/app/node_modules

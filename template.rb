@@ -36,6 +36,7 @@ gem_group :test do
   gem 'rspec_api_blueprint_matchers', '~> 0.1'
   gem 'capybara', '~> 2.14'
   gem 'capybara-screenshot', '~> 1.0'
+  gem 'aws-sdk', '~> 2.9'
   gem 'selenium-webdriver', '~> 3.4'
 end
 
@@ -82,6 +83,10 @@ template 'app.json'
 template 'Procfile'
 template 'Procfile.dev'
 
+# Codeship
+template 'codeship-services.yml'
+template 'codeship-steps.yml'
+
 # Rails config
 template 'config/puma.rb'
 template 'config/initializers/cors.rb'
@@ -120,6 +125,7 @@ template 'spec/support/rspec_api_blueprint_matchers.rb'
 template 'spec/support/api_documentation_coverage.rb'
 template 'spec/support/api_http_recorder.rb'
 template 'spec/support/capybara.rb'
+template 'spec/support/capybara-screenshot.rb'
 
 # Starting point for API documentation
 template 'docs/api/root.apib'

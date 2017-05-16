@@ -44,7 +44,8 @@ if(process.env.NODE_ENV === 'development'){
     },
     headers:{
       'Content-Type': 'text/html'
-    }
+    },
+    disableHostCheck: true
   }
 
 }

@@ -1,0 +1,51 @@
+web:
+  build:
+    image: flomotlik/discourse
+    dockerfile_path: Dockerfile.ruby
+  entrypoint: ./bin/docker/ruby_entrypoint
+  environment:
+    DATABASE_URL: 'postgres://postgres:@postgres:5432/shift_authentication_production'
+    DEVELOPMENT_DATABASE_URL: 'postgres://postgres:@postgres:5432/shift_authentication_development'
+    TEST_DATABASE_URL: 'postgres://postgres:@postgres:5432/shift_authentication_test'
+    REDIS_URL: 'redis://redis:6379'
+    JWT_BOUNCER_SHARED_SECRET: 'localdevelopment'
+    SELENIUM_URL: 'http://selenium:4444/wd/hub'
+    MEMCACHE_SERVERS: 'memcached:11211'
+    RAILS_ENV: test
+  links:
+    - postgres
+    - redis
+    - selenium
+    - memcached
+    - yarn
+  depends_on:
+    - postgres
+    - redis
+    - selenium
+    - memcached
+    - yarn
+
+  cached: true
+  volumes:
+    - ./:/code
+    - rubygems_cache:/rubygems
+postgres:
+  image: postgres:9.6.2
+redis:
+  image: redis:3.2
+selenium:
+  image: selenium/standalone-chrome
+memcached:
+  image: memcached
+yarn:
+  build:
+    context: .
+    dockerfile: Dockerfile.yarn
+  command: yarn run devserver
+  entrypoint: ./bin/docker/yarn_entrypoint
+  environment:
+    PORT: 4000
+    API_HOST: 'http://web:3000'
+  volumes:
+    - .:/app
+    - yarn_cache:/app/node_modules
