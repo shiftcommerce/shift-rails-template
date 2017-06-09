@@ -62,10 +62,13 @@ if Object.const_defined?('Shift') && Shift.const_defined?('Api') && Shift::Api.c
   RSpec.configure do |config|
     config.include HttpRecorder::Helper, type: :api
     config.include HttpRecorder::Helper, type: :request
+    config.include HttpRecorder::Helper, type: :feature
     config.before(:each, type: :api) { start_http_recorder }
     config.before(:each, type: :request) { start_http_recorder }
+    config.before(:each, type: :feature) { start_http_recorder }
     config.after(:each, type: :api) { stop_http_recorder }
     config.after(:each, type: :request) { stop_http_recorder }
+    config.after(:each, type: :feature) { stop_http_recorder }
   end
 else
   Rails.logger.warn("Warning - HTTP Recorder not started - The API HTTP Recorder (spec/support/api_http_recorder.rb) will only work once you have an API access gem in your project as it required Shift::Api::Core")

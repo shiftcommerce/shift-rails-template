@@ -72,6 +72,9 @@ template 'bin/rake'
 # make all scripts executable
 run 'chmod +x bin/docker/* bin/* bin/dev/*'
 
+# git
+template '.gitignore'
+
 # Docker
 template '.dockerignore'
 template 'docker-compose.yml'
@@ -126,6 +129,9 @@ template 'spec/support/api_documentation_coverage.rb'
 template 'spec/support/api_http_recorder.rb'
 template 'spec/support/capybara.rb'
 template 'spec/support/capybara-screenshot.rb'
+
+# RSpec Throw away specs
+template 'spec/integration/welcome_spec.rb'
 
 # Starting point for API documentation
 template 'docs/api/root.apib'

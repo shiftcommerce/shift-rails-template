@@ -12,6 +12,7 @@ web:
     SELENIUM_URL: 'http://selenium:4444/wd/hub'
     MEMCACHE_SERVERS: 'memcached:11211'
     RAILS_ENV: test
+
   links:
     - postgres
     - redis
@@ -35,6 +36,8 @@ redis:
   image: redis:3.2
 selenium:
   image: selenium/standalone-chrome
+  links:
+    - yarn
 memcached:
   image: memcached
 yarn:

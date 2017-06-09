@@ -1,4 +1,4 @@
 - type: serial
   steps:
   - service: web
-    command: bash -c "rake db:create RAILS_ENV=test && bundle exec rake db:migrate && bundle exec rspec"
+    command: bash -c "bundle exec rake db:create && bundle exec rake db:migrate && bundle exec rspec"
