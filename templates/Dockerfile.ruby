@@ -7,7 +7,7 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essen
 # Install drafter for API Blueprint Parsing
 RUN mkdir /tmp_build
 RUN cd /tmp_build
-RUN bash -c "git clone --recursive git://github.com/apiaryio/drafter.git; cd drafter; ./configure; make test; make drafter; make install"
+RUN bash -c "git clone --recursive git://github.com/apiaryio/drafter.git; cd drafter; git checkout tags/v3.2.6; ./configure; make test; make drafter; make install"
 RUN rm -rf /tmp_build
 
 # Add repository and key for postgres

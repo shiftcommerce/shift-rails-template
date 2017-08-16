@@ -2,4 +2,8 @@
 # ensure docker-machine won't be used
 unset ${!DOCKER_*}
 # spin up our image
-RAILS_ENV=${RAILS_ENV:-development} docker-compose up --build
+if [ -f .env ]; then
+  RAILS_ENV=${RAILS_ENV:-development} docker-compose -f docker-compose.yml -f docker-compose-env.yml up --build
+else
+  RAILS_ENV=${RAILS_ENV:-development} docker-compose up --build
+fi

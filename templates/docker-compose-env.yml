@@ -1,0 +1,6 @@
+version: '2'
+
+# Used to add the .env file if found as seen in bin/dev/boot
+services:
+  web:
+    env_file: .env

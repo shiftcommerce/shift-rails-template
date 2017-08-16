@@ -1,4 +1,8 @@
-- type: serial
+- type: parallel
   steps:
-  - service: web
-    command: bash -c "bundle exec rake db:create && bundle exec rake db:migrate && bundle exec rspec"
+  - name: JestSpecs
+    service: yarn
+    command: yarn run jest
+  - name: RubySpecs
+    service: web
+    command: bash -c "npm rebuild node-sass && yarn add webpack && yarn run test-build && RAILS_ENV=${RAILS_ENV:-test} rake db:create && bundle exec rake db:migrate && bundle exec rspec"

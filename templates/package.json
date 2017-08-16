@@ -1,5 +1,5 @@
 {
-  "name": "shift-inventory",
+  "name": "shift-<%= app_name %>",
   "version": "0.0.1",
   "main": "index.js",
   "author": "Shift Commerce",
@@ -34,7 +34,6 @@
     "react-router-dom": "^4.0.0",
     "reduce-reducers": "^0.1.2",
     "redux": "^3.6.0",
-    "redux-json-api": "^1.7.0",
     "redux-logger": "^2.8.1",
     "redux-thunk": "^2.2.0",
     "sass-loader": "^4.1.1",
@@ -46,7 +45,7 @@
     "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
     "testRegex": "/spec/admin/components/.+\\.spec\\.js$",
     "moduleNameMapper": {
-      "^.+\\.(css|scss)$": "<rootDir>/spec/support/jestStyleMock.js"
+      "^.+\\.(css|scss|svg)$": "<rootDir>/spec/support/jestStyleMock.js"
     }
   }
 }

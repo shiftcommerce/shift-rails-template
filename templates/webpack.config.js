@@ -1,9 +1,15 @@
 const webpack = require('webpack')
 const path = require('path')
 
+let host = ''
+if(process.env.NODE_ENV === 'development') {
+  host = 'http://localhost:4000'
+}
+
 const config  = {
-  context: path.resolve(__dirname, './app/assets/javascripts'),
-  entry: ['./index.js'],
+  entry: [
+    path.resolve(__dirname, './app/assets/javascripts/index.js')
+  ],
   output: {
     path: path.join(__dirname, 'public'),
     filename: 'bundle.js'
@@ -16,7 +22,7 @@ const config  = {
       },
       {
         test: /\.(scss|css)$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.js$/,
@@ -27,7 +33,7 @@ const config  = {
   },
   plugins: [
     new webpack.DefinePlugin({
-    	DEVELOPMENT: process.env.NODE_ENV === 'development',
+      DEVELOPMENT: process.env.NODE_ENV === 'development',
       API_HOST: JSON.stringify(process.env.API_HOST)
     })
   ]
@@ -37,18 +43,9 @@ if(process.env.NODE_ENV === 'development'){
 
   config.devServer = {
     port: process.env.PORT || 3000,
-    compress: true,
-    contentBase: path.join(__dirname, 'public'),
-    historyApiFallback: {
-      index: 'public/index.html'
-    },
-    headers:{
-      'Content-Type': 'text/html'
-    },
-    disableHostCheck: true
+    compress: true
   }
 
 }
-
 
 module.exports = config

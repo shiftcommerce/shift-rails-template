@@ -1,13 +1,13 @@
 {
   "name": "<%= app_name %>",
-  "description": "#{app_name} service",
+  "description": "<%= app_name %> service",
   "keywords": [
     "rails",
     "sidekiq"
   ],
-  "website": "https://github.com/shiftcommerce/#{app_name.gsub(/_/,'-')}",
-  "repository": "https://github.com/shiftcommerce/#{app_name.gsub(/_/,'-')}",
-  "logo": "https://raw.githubusercontent.com/shiftcommerce/#{app_name.gsub(/_/,'-')}/master/docs/logo.png",
+  "website": "https://github.com/shiftcommerce/<%= app_name.gsub(/_/,'-') %>",
+  "repository": "https://github.com/shiftcommerce/<%= app_name.gsub(/_/,'-') %>",
+  "logo": "https://raw.githubusercontent.com/shiftcommerce/<%= app_name.gsub(/_/,'-') %>/master/docs/logo.png",
   "success_url": "/",
   "scripts": {
     "postdeploy": "DISABLE_DATABASE_ENVIRONMENT_CHECK=1; bundle exec rake db:structure:load db:seed"

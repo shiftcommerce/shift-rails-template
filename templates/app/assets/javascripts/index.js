@@ -6,21 +6,12 @@ import { BrowserRouter as Router, Route, NavLink, Redirect, Switch } from 'react
 
 // redux
 import { Provider } from 'react-redux'
-import { setEndpointHost, setEndpointPath, setAccessToken, setHeaders } from 'redux-json-api'
-import rootReducer from './rootReducer'
 import configureStore from './configureStore'
 
 // import pages
 import WelcomePage from './pages/WelcomePage'
 
 const store = configureStore()
-
-if (DEVELOPMENT) {
-  store.dispatch(setEndpointHost(API_HOST))
-} else {
-  store.dispatch(setEndpointHost(window.location.origin))
-}
-store.dispatch(setEndpointPath('/inventory/v1'))
 
 // import css
 import '../stylesheets/application.css.scss'
