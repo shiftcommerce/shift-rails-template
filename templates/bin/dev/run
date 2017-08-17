@@ -1,2 +1,6 @@
 #!/bin/bash
-docker-compose run --rm -e RAILS_ENV=${RAILS_ENV:-development} web $@
+if [ -f .env ]; then
+  RAILS_ENV=${RAILS_ENV:-development} docker-compose -f docker-compose.yml -f docker-compose-env.yml run --rm web $@
+else
+  RAILS_ENV=${RAILS_ENV:-development} docker-compose run --rm web $@
+fi

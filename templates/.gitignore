@@ -27,4 +27,7 @@ yarn_cache
 # Ignore Byebug command history file.
 .byebug_history
 rubygems_cache
+
+# Ignore sensitive information
 .env
+codeship.aes

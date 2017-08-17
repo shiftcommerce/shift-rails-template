@@ -47,8 +47,6 @@ gem_group :test do
 end
 
 gem 'shift_commerce_' + app_name.gsub(/^shift-/,''), path: 'vendor/gems/shift_commerce_' + app_name.gsub(/^shift-/,'')
-gem 'shift_event_store', git: 'https://9b0896d04e66de44aec2e3fd4f97feed033e4749:x-oauth-basic@github.com/shiftcommerce/shift-event-store'
-gem 'shift-base-rails-engine', git: 'https://9b0896d04e66de44aec2e3fd4f97feed033e4749:x-oauth-basic@github.com/shiftcommerce/shift-base-rails-engine'
 
 gem 'jwt-bouncer', '0.1.1'
 
@@ -84,6 +82,7 @@ template 'bin/dev/guard'
 template 'bin/dev/jest'
 template 'bin/dev/rails'
 template 'bin/dev/rake'
+template 'bin/dev/recreate-test-db'
 template 'bin/dev/rspec'
 template 'bin/dev/run'
 template 'bin/dev/yarn'
@@ -96,6 +95,9 @@ template 'bin/rake'
 
 # make all scripts executable
 run 'chmod +x bin/docker/* bin/* bin/dev/*'
+
+# blank env example file
+template ".env.example"
 
 # git
 template '.gitignore'
@@ -203,3 +205,8 @@ template 'vendor/gems/shift_commerce_app/README.md', 'vendor/gems/shift_commerce
 
 # Starting point for API documentation
 template 'docs/api/root.apib'
+
+append_to_file "Gemfile" do
+  "\n\ngem 'shift_event_store', git: 'https://' + ENV.fetch('GITHUB_REPO_ACCESS_KEY','') + ':x-oauth-basic@github.com/shiftcommerce/shift-event-store'
+gem 'shift-base-rails-engine', git: 'https://' + ENV.fetch('GITHUB_REPO_ACCESS_KEY','') + ':x-oauth-basic@github.com/shiftcommerce/shift-base-rails-engine'"
+end
