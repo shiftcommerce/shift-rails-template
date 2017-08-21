@@ -144,7 +144,7 @@ template 'app/views/home/index.html.erb'
 
 # Event Store Boilerplate
 template 'app/controllers/application_api_controller.rb'
-template 'app/controllers/commands_controller.rb'
+template 'app/controllers/commands_controller.rb', 'app/controllers/' + app_name.gsub(/^shift-/,'') + '/v1/commands_controller.rb'
 template 'app/resources/app/v1/command_resource.rb', 'app/resources/' + app_name.gsub(/^shift-/,'') + '/v1/command_resource.rb'
 template 'config/initializers/shift_event_store.rb'
 template 'db/migrate/create_shift_event_store_event_records.rb', 'db/migrate/' + Time.now.strftime("%Y%m%d%H%M%S") + '_create_shift_event_store_event_records.rb'
