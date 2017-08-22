@@ -19,7 +19,7 @@ const config  = {
     rules: [
       {
         test: /\.(png|jpe?g|gif|svg)$/,
-        use: ['file-loader?name=[name]-[hash].[ext]&publicPath=${host}/images/&outputPath=images/']
+        use: [`file-loader?name=[name]-[hash].[ext]&publicPath=${host}/images/&outputPath=images/`]
       },
       {
         test: /\.(scss)$/,

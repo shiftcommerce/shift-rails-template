@@ -1,2 +1,2 @@
 #!/bin/bash
-RAILS_ENV=${RAILS_ENV:-development} ./bin/dev/run bundle $@
+RAILS_ENV=${RAILS_ENV:-development} ./bin/dev/run ./bin/docker/dbconsole

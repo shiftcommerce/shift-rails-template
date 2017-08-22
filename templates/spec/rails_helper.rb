@@ -19,7 +19,7 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 if ActiveRecord::Migrator.needs_migration?
   raise ActiveRecord::PendingMigrationError,
         "Migrations are pending. To resolve this issue, run:\n
-         RAILS_ENV=test ./bin/dev/rails db:migrate"
+        ./bin/dev/rake db:migrate RAILS_ENV=test"
 end
 
 Billy.configure do |config|

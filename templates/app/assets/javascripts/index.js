@@ -15,6 +15,7 @@ import { AppShell, ApiConfig } from 'shift-admin-ui-kit'
 import WelcomePage from './pages/WelcomePage'
 
 // import css
+import "shift-admin-ui-kit/src/stylesheets/_application.css.scss"
 import '../stylesheets/application.css.scss'
 
 const store = configureStore()
@@ -29,7 +30,7 @@ render(
   <Provider store={store}>
     <Router>
       <Switch>
-        <AppShell activeSection="PIM" >
+        <AppShell activeSection="<%= app_name.gsub(/^shift-/,'').humanize %>" >
           <ApiConfig baseEndpoint={ baseEndpoint }/>
           <Route exact path='/' component={ WelcomePage } />
         </AppShell>

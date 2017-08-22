@@ -207,6 +207,6 @@ template 'vendor/gems/shift_commerce_app/README.md', 'vendor/gems/shift_commerce
 template 'docs/api/root.apib'
 
 append_to_file "Gemfile" do
-  "\n\ngem 'shift_event_store', git: 'https://' + ENV.fetch('GITHUB_REPO_ACCESS_KEY','') + ':x-oauth-basic@github.com/shiftcommerce/shift-event-store'
-gem 'shift-base-rails-engine', git: 'https://' + ENV.fetch('GITHUB_REPO_ACCESS_KEY','') + ':x-oauth-basic@github.com/shiftcommerce/shift-base-rails-engine'"
+  "\n\ngem 'shift_event_store', git: 'https://GITHUB_REPO_ACCESS_KEY:x-oauth-basic@github.com/shiftcommerce/shift-event-store'
+gem 'shift-base-rails-engine', git: 'https://GITHUB_REPO_ACCESS_KEY:x-oauth-basic@github.com/shiftcommerce/shift-base-rails-engine'"
 end
