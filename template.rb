@@ -132,7 +132,6 @@ template 'config/environments/development.rb'
 template 'config/environments/production.rb'
 
 # Front end
-template 'public/index.html'
 template 'app/assets/javascripts/pages/WelcomePage.js'
 template 'app/assets/javascripts/actions.js'
 template 'app/assets/javascripts/configureStore.js'
@@ -152,6 +151,7 @@ template 'db/migrate/create_shift_event_store_event_records.rb', 'db/migrate/' +
 # Ruby Boilerplate
 template 'app/models/app.rb', 'app/models/' + app_name.gsub(/^shift-/,'') + '.rb'
 template 'app/resources/concerns/multi_tenant_resource.rb'
+template 'app/resources/app/v1/base_resource.rb', 'app/resources/' + app_name.gsub(/^shift-/,'') + '/v1/base_resource.rb'
 template 'lib/duplicate_request_detection.rb'
 template 'lib/extract_request_uuid_from_request.rb'
 

@@ -18,3 +18,5 @@ You can also apply this to an existing Rails app using:
 * Configures PostgreSQL and Redis as dependencies
 * Implements a Rubygem cache so each build doesn't require re-downloading and rebuilding of all gems
 * Sets a persisted volume for PostgreSQL so your database isn't trashed between container rebuilds
+
+**Note** To give the app access to the shift_event_store and shift-base-rails-engine gems you will need to replace the `GITHUB_REPO_ACCESS_KEY` in the Gemfile with a valid github access key as they are private repos

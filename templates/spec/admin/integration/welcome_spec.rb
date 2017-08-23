@@ -4,7 +4,12 @@ require 'rails_helper'
 # delete and add your own specs once you are happy with the setup
 RSpec.describe "Welcome to shift", js: true, type: :feature do
   it "should show the welcome page" do
-    visit "/"
+    # Arrange
+
+    # Act
+    sign_in
+
+    # Assert
     expect(page).to have_text "Welcome To Shift Commerce Front End"
   end
 end
