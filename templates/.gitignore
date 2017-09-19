@@ -10,8 +10,24 @@
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
-yarn-error.log
 
+# Ignore annoying Mac files
+**.DS_Store
+
+# Ignore Yarn
+/node_modules
+yarn-error.log
+yarn_cache
+
+# Ignore F/E build directory
+/public
+!/public/index.html
+!/public/favicon.ico
+
+# Ignore Byebug command history file.
 .byebug_history
 rubygems_cache
-yarn_cache
+
+# Ignore sensitive information
+.env
+codeship.aes

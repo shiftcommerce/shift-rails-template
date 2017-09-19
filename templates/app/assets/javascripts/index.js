@@ -6,33 +6,35 @@ import { BrowserRouter as Router, Route, NavLink, Redirect, Switch } from 'react
 
 // redux
 import { Provider } from 'react-redux'
-import { setEndpointHost, setEndpointPath, setAccessToken, setHeaders } from 'redux-json-api'
-import rootReducer from './rootReducer'
 import configureStore from './configureStore'
+
+// import components
+import { AppShell, ApiConfig } from 'shift-admin-ui-kit'
 
 // import pages
 import WelcomePage from './pages/WelcomePage'
 
+// import css
+import "shift-admin-ui-kit/src/stylesheets/_application.css.scss"
+import '../stylesheets/application.css.scss'
+
 const store = configureStore()
 
+let baseEndpoint = window.location.origin
 if (DEVELOPMENT) {
-  store.dispatch(setEndpointHost(API_HOST))
-} else {
-  store.dispatch(setEndpointHost(window.location.origin))
+  baseEndpoint = API_HOST
 }
-store.dispatch(setEndpointPath('/inventory/v1'))
-
-// import css
-import '../stylesheets/application.css.scss'
+baseEndpoint += '/<%= app_name.gsub(/^shift-/,'') %>/v1'
 
 render(
   <Provider store={store}>
     <Router>
-      <div>
-        <Switch>
-          <Route exact path='/' component={WelcomePage} />
-        </Switch>
-      </div>
+      <Switch>
+        <AppShell activeSection="<%= app_name.gsub(/^shift-/,'').humanize %>" >
+          <ApiConfig baseEndpoint={ baseEndpoint }/>
+          <Route exact path='/' component={ WelcomePage } />
+        </AppShell>
+      </Switch>
     </Router>
   </Provider>,
   document.getElementById('app')

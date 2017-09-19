@@ -11,9 +11,6 @@ services:
     volumes:
       - .:/app
       - rubygems_cache:/rubygems
-    depends_on:
-      - postgres
-      - redis
     ports:
       - '3000:3000'
     environment:
@@ -25,13 +22,11 @@ services:
       REDIS_URL: 'redis://redis:6379'
       JWT_BOUNCER_SHARED_SECRET: 'localdevelopment'
       SELENIUM_URL: 'http://selenium:4444/wd/hub'
-      <% if use_memcache %>MEMCACHE_SERVERS: 'memcached:11211'
-      <% end %>
+      <% if use_memcache %>MEMCACHE_SERVERS: 'memcached:11211'<% end %>
     depends_on:
       - postgres
       - redis
       - selenium
-      - yarn
       <% if use_memcache %>- memcached<% end -%>
 
   yarn:
@@ -39,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.yarn
-    command: yarn run devserver
+    command: bash -c "npm rebuild node-sass && yarn run devserver"
     ports:
       - '4000:4000'
     entrypoint: ./bin/docker/yarn_entrypoint
@@ -49,6 +44,7 @@ services:
     volumes:
       - .:/app
       - yarn_cache:/app/node_modules
+
   postgres:
     image: postgres:9.6.2
     ports:
@@ -65,13 +61,13 @@ services:
     image: selenium/standalone-chrome
     ports:
       - '4444'
+      - '43001'
   <% if use_memcache %>
   memcached:
     image: memcached
     ports:
       - "11211:11211"
-  <% end -%>
-
+<% end -%>
 volumes:
   postgres_data:
   rubygems_cache:

@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <title>Shift <%= app_name.gsub(/^shift-/,'').camelize %></title>
+    <script type='text/javascript'>
+       document.config = <%%= config.to_json.html_safe %>
+    </script>
+  </head>
+
+  <body>
+    <div id='app'></div>
+    <%%= javascript_include_tag('/bundle.js') %>
+  </body>
+</html>

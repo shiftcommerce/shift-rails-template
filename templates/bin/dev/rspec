@@ -1,2 +1,10 @@
 #!/bin/bash
+
+#remove existing bundlejs file
+rm -rf public/bundle.js
+
+#recreate bundlejs with latest code changes
+docker-compose -f docker-compose-test.yml run bundlejs
+
+#run rspec
 RAILS_ENV=${RAILS_ENV:-test} ./bin/dev/run bundle exec rspec $@
