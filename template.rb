@@ -152,6 +152,7 @@ template 'db/migrate/create_shift_event_store_event_records.rb', 'db/migrate/' +
 template 'app/models/app.rb', 'app/models/' + app_name.gsub(/^shift-/,'') + '.rb'
 template 'app/resources/concerns/multi_tenant_resource.rb'
 template 'app/resources/app/v1/base_resource.rb', 'app/resources/' + app_name.gsub(/^shift-/,'') + '/v1/base_resource.rb'
+template 'lib/tasks/authentication.rake'
 template 'lib/duplicate_request_detection.rb'
 template 'lib/extract_request_uuid_from_request.rb'
 
