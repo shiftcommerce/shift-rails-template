@@ -24,7 +24,7 @@ web:
   volumes:
     - ./:/code
     - rubygems_cache:/rubygems
-    - yarn_cache:/app/node_modules
+    - web_cache:/app/node_modules
 
 postgres:
   image: postgres:9.6.2

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module Pim
+module <%= app_name.gsub(/^shift-/,'').camelize %>
   module V1
     class CommandsController < ApplicationApiController
       include Shift::Base::Rails::Engine::CommandsController

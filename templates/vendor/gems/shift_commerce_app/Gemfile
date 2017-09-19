@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in shift_commerce_<%= app_name.gsub(/^shift-/,'').camelize %>.gemspec
+# Specify your gem's dependencies in shift_commerce_<%= app_name.gsub(/^shift-/,'').downcase %>.gemspec
 gemspec
